@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>menno · sdai.nl</title>
+    <title>menno · drankje bestellen</title>
     <style>
       :root { color-scheme: light dark; }
       * { box-sizing: border-box; }
@@ -12,42 +12,351 @@
         font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
         background: radial-gradient(1200px 600px at 50% -10%, #6366f1 0%, #0b1020 55%);
         color: #e7e9f3;
+        padding: 1.5rem;
       }
       .card {
-        max-width: 640px; margin: 2rem; padding: 2.5rem;
+        width: 100%; max-width: 680px; padding: 2.5rem;
         background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
         border-radius: 20px; backdrop-filter: blur(8px);
         box-shadow: 0 20px 60px rgba(0,0,0,0.35);
       }
-      h1 { margin: 0 0 .25rem; font-size: 2rem; }
       .badge { display:inline-block; font-size:.8rem; padding:.2rem .6rem;
         background:#6366f1; border-radius:999px; margin-bottom:1rem; }
-      p { line-height: 1.6; opacity: .9; }
-      code { background: rgba(0,0,0,.35); padding: .15rem .4rem; border-radius: 6px; font-size:.9em; }
-      ol { line-height: 1.9; }
-      a { color: #a5b4fc; }
+      .chat-link {
+        display:inline-block; margin-left:.5rem; margin-bottom:1rem;
+        font-size:.85rem; color:#c7d2fe; text-decoration:none;
+        padding:.2rem .6rem; border:1px solid rgba(129,140,248,.5); border-radius:999px;
+        transition:.15s;
+      }
+      .chat-link:hover { background:rgba(99,102,241,.25); }
+      h1 { margin: 0 0 .25rem; font-size: 1.9rem; }
+      h2 { margin: 2rem 0 .75rem; font-size: 1.1rem; opacity:.95; }
+      p.sub { margin:.25rem 0 1.5rem; opacity:.75; font-size:.95rem; }
+      label { display:block; font-size:.9rem; margin: 0 0 .4rem; opacity:.9; }
+      input[type="text"], input[type="email"], textarea {
+        width: 100%; padding: .8rem .9rem; font-size: 1rem; color: #e7e9f3;
+        background: rgba(0,0,0,.3); border: 1px solid rgba(255,255,255,.18);
+        border-radius: 12px; outline: none;
+      }
+      input[type="text"]:focus, input[type="email"]:focus, textarea:focus {
+        border-color:#818cf8; box-shadow:0 0 0 3px rgba(99,102,241,.25);
+      }
+      textarea { resize: vertical; min-height: 110px; font-family: inherit; }
+      .divider { border: none; border-top: 1px solid rgba(255,255,255,.12); margin: 2rem 0; }
+      .drinks { display: grid; grid-template-columns: repeat(3, 1fr); gap: .75rem; margin-top:.4rem; }
+      .drink {
+        display:flex; flex-direction:column; align-items:center; gap:.35rem;
+        padding: 1rem .5rem; cursor:pointer; text-align:center;
+        background: rgba(0,0,0,.25); border: 1px solid rgba(255,255,255,.18);
+        border-radius: 14px; transition: .15s; user-select:none;
+      }
+      .drink:hover { border-color:#818cf8; transform: translateY(-1px); }
+      .drink input { display:none; }
+      .drink .emoji { font-size: 1.9rem; }
+      .drink .name { font-size:.95rem; text-transform: capitalize; }
+      .drink.selected { background: rgba(99,102,241,.35); border-color:#a5b4fc; }
+      .field { margin-top: 1.25rem; }
+      button {
+        width: 100%; margin-top: 1.5rem; padding: .9rem; font-size: 1rem; font-weight:600;
+        color:#fff; background: linear-gradient(180deg,#6366f1,#4f46e5);
+        border: none; border-radius: 12px; cursor: pointer; transition:.15s;
+      }
+      button:hover { filter: brightness(1.08); }
+      button:disabled { opacity:.6; cursor: default; }
+      .msg { margin-top: 1rem; padding:.75rem 1rem; border-radius:12px; font-size:.92rem; display:none; }
+      .msg.ok { display:block; background: rgba(34,197,94,.18); border:1px solid rgba(34,197,94,.5); }
+      .msg.err { display:block; background: rgba(239,68,68,.18); border:1px solid rgba(239,68,68,.5); }
+      .orders { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.5rem; }
+      .orders li {
+        display:flex; align-items:center; gap:.75rem; padding:.7rem .9rem;
+        background: rgba(0,0,0,.25); border:1px solid rgba(255,255,255,.12); border-radius:12px;
+      }
+      .orders .who { font-weight:600; }
+      .orders .what { opacity:.9; text-transform: capitalize; }
+      .orders .detail { opacity:.6; font-size:.85rem; }
+      .orders .spacer { flex:1; }
+      .orders .del {
+        width:auto; margin:0; padding:.3rem .6rem; font-size:.8rem; font-weight:500;
+        background: rgba(239,68,68,.25); border:1px solid rgba(239,68,68,.4);
+      }
+      .empty { opacity:.6; font-size:.92rem; }
+      .clear { width:auto; margin-top:1rem; padding:.45rem .8rem; font-size:.85rem;
+        font-weight:500; background: rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); }
+      @media (max-width: 520px) { .drinks { grid-template-columns: 1fr; } }
     </style>
   </head>
   <body>
     <main class="card">
       <span class="badge">AI Training · sdai.nl</span>
-      <h1>Hoi menno 👋</h1>
-      <p>
-        Je omgeving draait. Deze pagina wordt geserveerd vanuit
-        <code>/workspace/menno-website</code> op poort <code>3000</code> en is
-        live op <a href="https://menno.sdai.nl">menno.sdai.nl</a>.
-      </p>
-      <p>Aan de slag met je agent:</p>
-      <ol>
-        <li>Open de browser-IDE of SSH in je omgeving.</li>
-        <li>Laat de agent deze site verbouwen tot jouw web-app.</li>
-        <li>Sla het werk op: <code>git add -A &amp;&amp; git commit -m "..." &amp;&amp; git push</code></li>
-      </ol>
-      <p style="opacity:.7;font-size:.9rem">
-        Je code staat in <code>github.com/sayfjawad/menno-website</code>.
-        Vervang gerust <code>server.js</code> en <code>index.html</code> door je eigen framework —
-        blijf alleen op <code>0.0.0.0:3000</code> serveren.
-      </p>
+      <a class="chat-link" href="/chat.html">💬 Chat met Qwen</a>
+      <h1>Bestel je drankje ☕</h1>
+      <p class="sub">Vul je naam in, kies een drankje en zet het op de lijst.</p>
+
+      <form id="order-form">
+        <div class="field">
+          <label for="name">Jouw naam</label>
+          <input id="name" type="text" placeholder="bijv. Menno" autocomplete="name" required />
+        </div>
+
+        <div class="field">
+          <label>Kies een drankje</label>
+          <div class="drinks" id="drinks">
+            <label class="drink">
+              <input type="radio" name="drink" value="koffie" />
+              <span class="emoji">☕</span><span class="name">Koffie</span>
+            </label>
+            <label class="drink">
+              <input type="radio" name="drink" value="thee" />
+              <span class="emoji">🍵</span><span class="name">Thee</span>
+            </label>
+            <label class="drink">
+              <input type="radio" name="drink" value="frisdrank" />
+              <span class="emoji">🥤</span><span class="name">Frisdrank</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="detail">Extra (optioneel)</label>
+          <input id="detail" type="text" placeholder="bijv. cappuccino, met melk, cola zero…" />
+        </div>
+
+        <button type="submit" id="submit-btn">Op de lijst zetten</button>
+        <div class="msg" id="msg"></div>
+      </form>
+
+      <h2>Bestellijst <span id="count" class="empty"></span></h2>
+      <ul class="orders" id="orders"></ul>
+      <button type="button" class="clear" id="clear-btn">Lijst wissen</button>
+
+      <hr class="divider" />
+
+      <h2>Contact</h2>
+      <p class="sub">Heb je een vraag of opmerking? Stuur een bericht.</p>
+
+      <form id="contact-form" novalidate>
+        <div class="field">
+          <label for="c-name">Naam</label>
+          <input id="c-name" name="name" type="text" placeholder="Jouw naam" autocomplete="name" />
+          <div class="msg" id="c-name-err"></div>
+        </div>
+
+        <div class="field">
+          <label for="c-email">E-mailadres</label>
+          <input id="c-email" name="email" type="email" placeholder="naam@voorbeeld.nl" autocomplete="email" />
+          <div class="msg" id="c-email-err"></div>
+        </div>
+
+        <div class="field">
+          <label for="c-message">Bericht</label>
+          <textarea id="c-message" name="message" placeholder="Typ je bericht…"></textarea>
+          <div class="msg" id="c-message-err"></div>
+        </div>
+
+        <button type="submit" id="contact-btn">Verstuur</button>
+        <div class="msg" id="contact-msg"></div>
+      </form>
     </main>
+
+    <script>
+      const form = document.getElementById("order-form");
+      const nameEl = document.getElementById("name");
+      const detailEl = document.getElementById("detail");
+      const msg = document.getElementById("msg");
+      const ordersEl = document.getElementById("orders");
+      const countEl = document.getElementById("count");
+      const submitBtn = document.getElementById("submit-btn");
+      const clearBtn = document.getElementById("clear-btn");
+
+      const EMOJI = { koffie: "☕", thee: "🍵", frisdrank: "🥤" };
+
+      // Highlight the selected drink card.
+      document.querySelectorAll(".drink").forEach((card) => {
+        card.addEventListener("click", () => {
+          document.querySelectorAll(".drink").forEach((c) => c.classList.remove("selected"));
+          card.classList.add("selected");
+        });
+      });
+
+      function showMsg(text, kind) {
+        msg.textContent = text;
+        msg.className = "msg " + kind;
+      }
+
+      function clearMsg() {
+        msg.className = "msg";
+        msg.textContent = "";
+      }
+
+      async function loadOrders() {
+        try {
+          const res = await fetch("/api/orders");
+          const data = await res.json();
+          renderOrders(data.orders || []);
+        } catch {
+          renderOrders([]);
+        }
+      }
+
+      function renderOrders(orders) {
+        ordersEl.innerHTML = "";
+        countEl.textContent = orders.length ? `(${orders.length})` : "";
+        if (!orders.length) {
+          const li = document.createElement("li");
+          li.className = "empty";
+          li.textContent = "Nog geen bestellingen. Wees de eerste!";
+          ordersEl.appendChild(li);
+          return;
+        }
+        for (const o of orders) {
+          const li = document.createElement("li");
+
+          const emoji = document.createElement("span");
+          emoji.textContent = EMOJI[o.drink] || "🥤";
+
+          const who = document.createElement("span");
+          who.className = "who";
+          who.textContent = o.name;
+
+          const what = document.createElement("span");
+          what.className = "what";
+          what.textContent = o.drink;
+
+          li.append(emoji, who, what);
+
+          if (o.detail) {
+            const d = document.createElement("span");
+            d.className = "detail";
+            d.textContent = "· " + o.detail;
+            li.appendChild(d);
+          }
+
+          const spacer = document.createElement("span");
+          spacer.className = "spacer";
+          li.appendChild(spacer);
+
+          const del = document.createElement("button");
+          del.type = "button";
+          del.className = "del";
+          del.textContent = "✕";
+          del.title = "Verwijderen";
+          del.addEventListener("click", () => removeOrder(o.id));
+          li.appendChild(del);
+
+          ordersEl.appendChild(li);
+        }
+      }
+
+      async function removeOrder(id) {
+        await fetch("/api/orders/" + encodeURIComponent(id), { method: "DELETE" });
+        loadOrders();
+      }
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        clearMsg();
+
+        const name = nameEl.value.trim();
+        const checked = form.querySelector('input[name="drink"]:checked');
+        const drink = checked ? checked.value : "";
+        const detail = detailEl.value.trim();
+
+        if (!name) return showMsg("Vul je naam in.", "err");
+        if (!drink) return showMsg("Kies een drankje.", "err");
+
+        submitBtn.disabled = true;
+        try {
+          const res = await fetch("/api/orders", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, drink, detail }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || "Er ging iets mis.");
+          showMsg(`Bedankt ${name}! Je ${drink} staat op de lijst. ✅`, "ok");
+          form.reset();
+          document.querySelectorAll(".drink").forEach((c) => c.classList.remove("selected"));
+          loadOrders();
+        } catch (err) {
+          showMsg(err.message, "err");
+        } finally {
+          submitBtn.disabled = false;
+        }
+      });
+
+      clearBtn.addEventListener("click", async () => {
+        if (!confirm("Weet je zeker dat je de hele bestellijst wilt wissen?")) return;
+        await fetch("/api/orders", { method: "DELETE" });
+        clearMsg();
+        loadOrders();
+      });
+
+      // ------------------------------------------------------------- contact form ---
+      const contactForm = document.getElementById("contact-form");
+      const cNameEl = document.getElementById("c-name");
+      const cEmailEl = document.getElementById("c-email");
+      const cMessageEl = document.getElementById("c-message");
+      const cNameErr = document.getElementById("c-name-err");
+      const cEmailErr = document.getElementById("c-email-err");
+      const cMessageErr = document.getElementById("c-message-err");
+      const contactMsg = document.getElementById("contact-msg");
+      const contactBtn = document.getElementById("contact-btn");
+
+      const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      function setFieldError(el, text) {
+        el.textContent = text;
+        el.className = "msg" + (text ? " err" : "");
+      }
+
+      contactForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const name = cNameEl.value.trim();
+        const email = cEmailEl.value.trim();
+        const message = cMessageEl.value.trim();
+        let ok = true;
+
+        if (!name) {
+          setFieldError(cNameErr, "Vul je naam in.");
+          ok = false;
+        } else {
+          setFieldError(cNameErr, "");
+        }
+
+        if (!email) {
+          setFieldError(cEmailErr, "Vul je e-mailadres in.");
+          ok = false;
+        } else if (!EMAIL_RE.test(email)) {
+          setFieldError(cEmailErr, "Vul een geldig e-mailadres in.");
+          ok = false;
+        } else {
+          setFieldError(cEmailErr, "");
+        }
+
+        if (!message) {
+          setFieldError(cMessageErr, "Vul een bericht in.");
+          ok = false;
+        } else if (message.length < 10) {
+          setFieldError(cMessageErr, "Je bericht is te kort (minimaal 10 tekens).");
+          ok = false;
+        } else {
+          setFieldError(cMessageErr, "");
+        }
+
+        if (!ok) {
+          contactMsg.className = "msg";
+          contactMsg.textContent = "";
+          return;
+        }
+
+        // Geen e-mail-endpoint op deze server: toon een bevestiging.
+        contactMsg.textContent = `Bedankt ${name}, je bericht is verstuurd! ✅`;
+        contactMsg.className = "msg ok";
+        contactForm.reset();
+      });
+
+      loadOrders();
+    </script>
   </body>
 </html>

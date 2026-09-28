@@ -6,3 +6,6 @@ build/
 *.log
 .DS_Store
 .env
+
+# Runtime data (drink orders) — not part of the repo
+data/
